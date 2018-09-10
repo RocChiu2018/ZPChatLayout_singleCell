@@ -1,0 +1,2 @@
+# ZPChatLayout_singleCell
+介绍在storyboard文件中利用一个cell来创建聊天布局。
