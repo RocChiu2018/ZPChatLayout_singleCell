@@ -91,9 +91,10 @@
     [showContentButton setTitle:self.message.text forState:UIControlStateNormal];
     
     /**
-     此时调用layoutIfNeeded（强制更新）方法的原因是：上面代码的意思只是为UIButton控件设置了它的内容文字，实际上这些内容文字是设置在UIButton控件里面的子控件titleLabel里面的。换言之，只是在titleLabel里面设置了内容文字，如果想要计算出此时titleLabel的高度的话就需要强制更新该UIButton控件才可以。
+     此时调用layoutIfNeeded（强制更新）方法的原因是：上面代码的意思只是为UIButton控件设置了它的内容文字，实际上这些内容文字是设置在UIButton控件里面的子控件titleLabel里面的。换言之，只是在titleLabel里面设置了内容文字，如果想要计算出此时titleLabel的高度的话就需要强制更新该UIButton控件才可以；
+     如果只是用showContentButton来调用layoutIfNeeded方法的话则只是showContentButton会被强制更新，而ZPTableViewCell内的其他控件则不会被强制更新，如果那样的话就会造成一些意想不到的问题，比如聊天页面中的cell和cell之间的距离会不固定等等。
      */
-    [showContentButton layoutIfNeeded];
+    [self layoutIfNeeded];
     
     /**
      当UIButton控件的内容文字多的时候，并且在xib文件中设置了此控件的x,y值，而且限制了此控件的宽度（最大宽度和最小宽度），在允许文字换行的情况下，它里面的titleLabel属性会根据文字的多少做高度的调整，但是UIButton控件的高度不能随着titleLabel属性的高度变化而变化，所以要单独设置UIButton控件的高度等于titleLabel属性的高度，以下代码的作用就是如此；
@@ -110,11 +111,12 @@
     /**
      此时调用layoutIfNeeded（强制更新）方法的原因是：上面的代码只是把按钮的高度设置成它里面的titleLabel控件的高度，但是在界面上并没有显示出来，必须要调用强制更新方法才能让按钮的高度和它里面的titleLabel控件的高度在界面上显示成一样的；
      */
-    [showContentButton layoutIfNeeded];
+    [self layoutIfNeeded];
     
     /**
      计算当前cell的高度(cell的高度不是UIButton控件的最大Y值就是头像的最大Y值)；
-     在这个类中封装ZPMessage对象的cellHeight属性。
+     在这个类中封装ZPMessage对象的cellHeight属性；
+     上面的代码中如果用showContentButton调用layoutIfNeeded方法的话则会造成聊天页面的最后一条聊天内容和输入框之间产生过大的距离，原因就是只强制更新了showContentButton控件，而没有强制更新ZPTableViewCell中的其他控件。在取得一个控件的frame之前要让这个控件强制更新一下，所以上面的代码中要用self调用layoutIfNeeded方法，这样的话ZPTableViewCell里面的所有控件就都更新了。
      */
     CGFloat buttonMaxY = CGRectGetMaxY(self.otherContentButton.frame);
     CGFloat iconImageViewY = CGRectGetMaxY(self.otherIconImageView.frame);
